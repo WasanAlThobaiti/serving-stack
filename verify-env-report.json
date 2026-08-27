@@ -1,0 +1,32 @@
+{
+  "tool": "aidc-verify-env",
+  "version": "1.0",
+  "generated_utc": "2026-08-27T11:55:53Z",
+  "student": "codespace",
+  "platform": "Linux x86_64",
+  "result": "PASS WITH WARNINGS",
+  "blocking": 0,
+  "warnings": 6,
+  "checks": [
+    {"check": "platform", "status": "pass", "detail": "Linux x86_64"},
+    {"check": "cpu architecture", "status": "pass", "detail": "x86_64"},
+    {"check": "memory", "status": "warn", "detail": "7.8 GB total; 8 GB is comfortable, expect slow CPU labs"},
+    {"check": "disk space", "status": "warn", "detail": "18.8 GB free here; 30 GB is comfortable through week 4"},
+    {"check": "curl", "status": "pass", "detail": "curl 8.5.0"},
+    {"check": "git", "status": "pass", "detail": "2.53.0"},
+    {"check": "git identity", "status": "warn", "detail": "user.name or user.email unset; your commits will not be attributed to you"},
+    {"check": "ssh key", "status": "warn", "detail": "no key in ~/.ssh; fine if you use HTTPS with a token for GitHub"},
+    {"check": "python 3", "status": "pass", "detail": "3.12.1 at /home/codespace/.python/current/bin/python3"},
+    {"check": "venv and pip", "status": "pass", "detail": "a virtual environment was created and pip works inside it"},
+    {"check": "docker client", "status": "pass", "detail": "Docker version 29.3.0-1"},
+    {"check": "docker daemon", "status": "pass", "detail": "reachable, server 29.3.0-1"},
+    {"check": "docker compose", "status": "pass", "detail": "2.40.3"},
+    {"check": "docker run", "status": "pass", "detail": "hello-world ran and exited cleanly"},
+    {"check": "docker hub login", "status": "pass", "detail": "logged in as wasanfaiz"},
+    {"check": "base image (cpu)", "status": "warn", "detail": "not pulled yet; run: docker pull python:3.11-slim"},
+    {"check": "base image (cuda)", "status": "warn", "detail": "about 2 GB, needed on week 2 day 4; run: docker pull nvidia/cuda:12.4.1-runtime-ubuntu22.04"},
+    {"check": "port 8000", "status": "pass", "detail": "free"},
+    {"check": "reach docker hub", "status": "pass", "detail": "registry-1.docker.io answered"},
+    {"check": "reach hugging face", "status": "pass", "detail": "the week-2 model is reachable"}
+  ]
+}
