@@ -1,14 +1,23 @@
+import os
 import time
 import uuid
+import logging
 import torch
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException, status
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import schemas
 
-MODEL_ID = "Qwen/Qwen2.5-0.5B-Instruct"
+# 1. قراءة المتغيرات من البيئة
+MODEL_ID = os.environ.get("MODEL_ID", "Qwen/Qwen2.5-0.5B-Instruct")
+API_KEY = os.environ.get("API_KEY", "")
+MAX_TOKENS_CEILING = int(os.environ.get("MAX_TOKENS", "256"))
+
+if not API_KEY:
+    logging.warning("WARNING: API_KEY is unset! Service is running unauthenticated.")
 
 app = FastAPI(title="OpenAI-compatible Serving Service")
 
+# 2. تحميل النموذج
 print(f"Loading tokenizer and model: {MODEL_ID}...")
 tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
 model = AutoModelForCausalLM.from_pretrained(
@@ -19,13 +28,30 @@ model = AutoModelForCausalLM.from_pretrained(
 model.eval()
 print("Model loaded successfully!")
 
+# 3. دالة فحص المفتاح السري لمسارات v1
+def verify_api_key(authorization: str = Header(None)):
+    if API_KEY:
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Missing or invalid Bearer token"
+            )
+        token = authorization.split("Bearer ")[1].strip()
+        if token != API_KEY:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid API key"
+            )
+
+# 4. نقطة فحص الصحة (تبقى مفتوحة دائماً بدون مفتاح)
 @app.get("/health")
 async def health():
-    return {"status": "ok", "model": MODEL_ID}
+    return {"status": "healthy", "model": MODEL_ID}
 
+# 5. استعراض النماذج (محمية بالمفتاح)
 @app.get("/v1/models")
-async def list_models():
-    # استخدام كلاسات schemas المتوفرة مباشرة أو إرجاع قاموس متوافق
+async def list_models(authorization: str = Header(None)):
+    verify_api_key(authorization)
     return {
         "object": "list",
         "data": [
@@ -38,8 +64,11 @@ async def list_models():
         ]
     }
 
+# 6. توليد الردود (محمية بالمفتاح مع تطبيق سقف التوكنز)
 @app.post("/v1/chat/completions")
-async def chat_completions(request: schemas.ChatCompletionRequest):
+async def chat_completions(request: schemas.ChatCompletionRequest, authorization: str = Header(None)):
+    verify_api_key(authorization)
+
     # 1. صياغة النص عبر المحادثة
     messages = [{"role": m.role, "content": m.content} for m in request.messages]
     prompt_text = tokenizer.apply_chat_template(
@@ -52,21 +81,24 @@ async def chat_completions(request: schemas.ChatCompletionRequest):
     model_inputs = tokenizer([prompt_text], return_tensors="pt")
     prompt_tokens = int(model_inputs.input_ids.shape[1])
     
-    # 3. توليد الرد
-    max_tokens = request.max_tokens or 32
+    # 3. تطبيق سقف التوكنز الأقصى (Clamp ceiling)
+    req_tokens = request.max_tokens if request.max_tokens else 32
+    effective_max_tokens = min(req_tokens, MAX_TOKENS_CEILING)
+    
+    # 4. توليد الرد
     with torch.no_grad():
         generated_ids = model.generate(
             **model_inputs,
-            max_new_tokens=max_tokens,
+            max_new_tokens=effective_max_tokens,
             do_sample=False
         )
     
-    # 4. فك تشفير التوكنز الجديدة
+    # 5. فك تشفير التوكنز الجديدة
     new_token_ids = generated_ids[0][prompt_tokens:]
     completion_tokens = int(len(new_token_ids))
     content = tokenizer.decode(new_token_ids, skip_special_tokens=True)
     
-    # 5. إرجاع الرد بصيغة OpenAI
+    # 6. إرجاع الرد بصيغة OpenAI
     response_data = {
         "id": f"chatcmpl-{uuid.uuid4().hex[:8]}",
         "object": "chat.completion",
@@ -89,7 +121,6 @@ async def chat_completions(request: schemas.ChatCompletionRequest):
         }
     }
     
-    # إرجاع النموذج عبر schema إن وجد أو كـ JSON
     if hasattr(schemas, "ChatCompletionResponse"):
         return schemas.ChatCompletionResponse(**response_data)
     return response_data
