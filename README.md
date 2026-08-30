@@ -1,42 +1,91 @@
-# serving-stack
+# LLM Serving & GPU Performance Profiling
 
-The one system this course builds. Your team creates this repository once from
-the template, and every lab from week 2 to graduation is a change to it. There
-is no week where you start again.
+A hands-on project developed as part of an **LLM Serving course**, focused on Large Language Model (LLM) deployment, GPU inference, performance profiling, and benchmarking.
 
-## What is here
+## About the Project
 
+This project follows a progressive, lab-based approach where the serving system is developed and enhanced throughout the course.
+
+The course instructors provided the project foundation, learning materials, technical guidance, and lab requirements. This repository documents my implementation, experiments, and practical work throughout the development process.
+
+## Key Areas
+
+* LLM model serving and inference
+* OpenAI-compatible APIs
+* GPU-based inference
+* Performance profiling
+* Benchmarking
+* Batch processing
+* Docker-based development
+* Environment verification and testing
+* Git and GitHub version control
+* GitHub Codespaces
+
+## Serving Architecture
+
+```text
+Client Application
+        │
+        ▼
+OpenAI-Compatible API
+        │
+        ▼
+LLM Serving Engine
+        │
+        ▼
+GPU Inference
+        │
+        ▼
+Model Response
 ```
-app/        empty. Your service goes here, starting week 2 day 2
-docs/       the API contract the Agentic AI cohort integrates against
-scripts/    verify-env.sh, which checks your machine against what the labs need
-PINS.md     every version this course depends on
-setup.md    how to work in this repository
-```
 
-That is the whole repository, and the shortness of that list is the point. You
-are not given a finished system to read. You build one, a day at a time, and by
-week 6 another cohort's agents are calling it.
+## Performance Profiling
 
-## What you add, and when
+A key focus of this project is understanding and evaluating the performance of LLM inference workloads.
 
-| Week | Day | What you add |
-|---|---|---|
-| 2 | Mon | `app/` behind an OpenAI-compatible `/v1` on CPU |
-| 2 | Tue | `Dockerfile`, and your image on Docker Hub |
-| 2 | Wed | `Dockerfile.gpu`, the same code on a GPU |
-| 2 | Thu | `compose.yaml`, the stack described rather than run by hand |
-| 3 | Thu | `bench/`, the harness that measures all of it |
+The profiling and benchmarking work focuses on:
 
-Each one is a lab, and each one starts from files that day hands you. Lab
-instructions, decks and quizzes are on the course Drive, one folder per week.
-This repository is your code.
+* GPU utilization
+* Inference performance
+* Batch processing behavior
+* Execution time
+* System performance
+* Performance bottlenecks
 
-## Start here
+## Technologies
 
-```bash
-./scripts/verify-env.sh     # checks your machine, writes verify-env-report.json
-```
+* **Python**
+* **vLLM**
+* **Docker**
+* **CUDA / GPU**
+* **OpenAI-Compatible APIs**
+* **Performance Profiling**
+* **Benchmarking**
+* **Git & GitHub**
+* **GitHub Codespaces**
 
-Then read `setup.md`. It is short, and it covers the two things that go wrong:
-committing a key, and committing a model.
+## Learning Outcomes
+
+Through this project, I gained practical experience in:
+
+* Deploying and serving LLM inference workloads
+* Working with GPU-based AI systems
+* Using vLLM for model serving
+* Working with OpenAI-compatible APIs
+* Profiling and benchmarking inference performance
+* Understanding batch processing
+* Using Docker in AI development workflows
+* Managing development with Git and GitHub
+
+## Course Acknowledgment
+
+This project was completed as part of an **LLM Serving course**.
+
+I would like to acknowledge the course instructors for providing the project foundation, learning materials, technical guidance, and hands-on labs that supported the development of this work.
+
+The repository builds upon the course-provided foundation and reflects my implementation, experiments, and learning throughout the lab sessions.
+
+## Author
+
+**Wasan Al-Thobaiti**
+
